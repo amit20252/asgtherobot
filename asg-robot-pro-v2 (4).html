@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASG Robot — Student Earning Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #05080f;
+  --surface: #090e1a;
+  --card: #0d1526;
+  --card2: #111d35;
+  --border: rgba(99,179,255,0.12);
+  --border2: rgba(99,179,255,0.06);
+  --blue: #4fa3ff;
+  --blue2: #2d8fff;
+  --cyan: #00e5d4;
+  --green: #00d68f;
+  --amber: #ffcc00;
+  --red: #ff4466;
+  --purple: #a855f7;
+  --pink: #f472b6;
+  --text: #e0eaf8;
+  --muted: #5c7a9e;
+  --faint: #131e33;
+  --ui: 'DM Sans', sans-serif;
+  --head: 'Syne', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --radius: 14px;
+  --radius-sm: 9px;
+  --shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--ui);font-size:15px;min-height:100vh;overflow-x:hidden}
+
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 60% at 15% -10%, rgba(79,163,255,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 85% 110%, rgba(0,229,212,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(168,85,247,0.03) 0%, transparent 70%);
+}
+
+/* Animated grid bg */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(79,163,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(79,163,255,0.03) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 0%,transparent 100%);
+}
+
+.page{display:none;min-height:100vh;position:relative;z-index:1}
+.page.active{display:block}
+
+/* ── NAVBAR ── */
+.navbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 36px;height:68px;
+  background:rgba(5,8,15,0.8);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:200
+}
+.brand{display:flex;align-items:center;gap:12px;cursor:pointer;text-decoration:none}
+.brand-icon{
+  width:38px;height:38px;border-radius:10px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  display:flex;align-items:center;justify-content:center;font-size:19px;
+  box-shadow:0 0 20px rgba(79,163,255,0.35),0 0 40px rgba(79,163,255,0.1)
+}
+.brand-name{font-family:var(--head);font-size:18px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.brand-name span{color:var(--cyan)}
+.nav-center{display:flex;gap:2px}
+.nav-link{
+  padding:8px 18px;border-radius:8px;border:none;
+  background:transparent;color:var(--muted);
+  font-family:var(--ui);font-size:14px;font-weight:500;
+  cursor:pointer;transition:all .2s
+}
+.nav-link:hover{color:var(--text);background:rgba(79,163,255,0.07)}
+.nav-link.active{color:var(--blue);background:rgba(79,163,255,0.12)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.avatar{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--blue2),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--head);font-size:14px;font-weight:700;color:#fff;cursor:pointer
+}
+.badge-notif{
+  padding:4px 12px;border-radius:20px;
+  background:rgba(79,163,255,0.12);border:1px solid rgba(79,163,255,0.2);
+  color:var(--blue);font-family:var(--mono);font-size:13px;font-weight:600
+}
+
+/* ── HERO ── */
+.hero{
+  min-height:calc(100vh - 68px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:100px 24px 80px
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 18px;border-radius:30px;
+  border:1px solid rgba(0,229,212,0.3);
+  background:rgba(0,229,212,0.06);
+  color:var(--cyan);font-size:12px;font-weight:600;
+  letter-spacing:.8px;text-transform:uppercase;
+  margin-bottom:32px;animation:fadeup .6s ease both
+}
+.hero-badge .pulse{
+  width:7px;height:7px;border-radius:50%;background:var(--cyan);
+  box-shadow:0 0 8px var(--cyan);
+  animation:glow-pulse 1.8s ease-in-out infinite
+}
+@keyframes glow-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
+.hero h1{
+  font-family:var(--head);
+  font-size:clamp(40px,6.5vw,78px);font-weight:800;line-height:1.05;
+  color:#fff;margin-bottom:24px;
+  animation:fadeup .7s .08s ease both;
+  letter-spacing:-2px
+}
+.hero h1 .grad{
+  background:linear-gradient(135deg,var(--blue) 0%,var(--cyan) 50%,var(--blue) 100%);
+  background-size:200%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmer 3s linear infinite
+}
+@keyframes shimmer{0%{background-position:0%}100%{background-position:200%}}
+.hero p{
+  max-width:580px;font-size:17px;color:var(--muted);line-height:1.75;
+  margin-bottom:44px;animation:fadeup .7s .18s ease both;font-weight:400
+}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;animation:fadeup .7s .28s ease both}
+
+/* ── BUTTONS ── */
+.btn{
+  padding:12px 28px;border-radius:10px;border:none;
+  font-family:var(--ui);font-size:14px;font-weight:600;
+  cursor:pointer;transition:all .22s;letter-spacing:.2px;display:inline-flex;align-items:center;gap:6px
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;
+  box-shadow:0 0 0 rgba(79,163,255,0)
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(79,163,255,0.35)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue);background:rgba(79,163,255,0.06)}
+.btn-green{background:linear-gradient(135deg,#00b87a,var(--green));color:#fff}
+.btn-green:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,214,143,0.3)}
+.btn-red{background:linear-gradient(135deg,#d42e52,var(--red));color:#fff}
+.btn-red:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,68,102,0.3)}
+.btn-amber{background:linear-gradient(135deg,#e6b800,var(--amber));color:#000;font-weight:700}
+.btn-sm{padding:9px 20px;font-size:13px}
+.btn-xs{padding:6px 14px;font-size:12px;border-radius:8px}
+.btn-full{width:100%;justify-content:center}
+
+/* ── STATS STRIP ── */
+.stats-strip{
+  display:flex;gap:0;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  background:rgba(9,14,26,0.7);backdrop-filter:blur(12px)
+}
+.strip-item{flex:1;padding:32px 20px;text-align:center;border-right:1px solid var(--border)}
+.strip-item:last-child{border-right:none}
+.strip-val{font-family:var(--mono);font-size:34px;font-weight:500;color:#fff}
+.strip-val span{color:var(--cyan)}
+.strip-label{font-size:11px;color:var(--muted);margin-top:5px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+
+/* ── SECTIONS ── */
+.section{padding:90px 36px;max-width:1240px;margin:0 auto}
+.section-label{
+  font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:14px
+}
+.section-title{font-family:var(--head);font-size:38px;font-weight:800;color:#fff;margin-bottom:12px;letter-spacing:-1px}
+.section-sub{font-size:16px;color:var(--muted);max-width:500px;line-height:1.7}
+
+/* ── SERVICE CARDS ── */
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:52px}
+.service-card{
+  background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);
+  padding:28px;transition:all .28s;cursor:pointer;position:relative;overflow:hidden
+}
+.service-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  transform:scaleX(0);transition:.3s;transform-origin:left
+}
+.service-card:hover{border-color:rgba(79,163,255,0.25);transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,0.4),0 0 0 1px rgba(79,163,255,0.1)}
+.service-card:hover::before{transform:scaleX(1)}
+.svc-icon{width:50px;height:50px;border-radius:13px;margin-bottom:18px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.svc-title{font-family:var(--head);font-size:16px;font-weight:700;color:#fff;margin-bottom:8px}
+.svc-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:16px}
+.svc-price{font-size:13px;font-weight:600;color:var(--green);font-family:var(--mono)}
+
+/* ── STEPS ── */
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:52px}
+.step-card{
+  background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);
+  padding:26px;text-align:center;transition:.25s
+}
+.step-card:hover{border-color:rgba(79,163,255,0.2);transform:translateY(-2px)}
+.step-num{
+  width:44px;height:44px;border-radius:12px;
+  background:rgba(79,163,255,0.12);color:var(--blue);
+  font-family:var(--head);font-size:20px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 18px
+}
+.step-title{font-family:var(--head);font-size:15px;font-weight:700;color:#fff;margin-bottom:8px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── PRICING ── */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:50px}
+.price-card{
+  background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);
+  padding:32px;transition:.25s;position:relative;overflow:hidden
+}
+.price-card.featured{
+  border-color:rgba(0,229,212,0.3);
+  background:linear-gradient(135deg,rgba(0,229,212,0.04),rgba(79,163,255,0.04));
+}
+.price-card.featured::before{
+  content:'MOST POPULAR';position:absolute;top:20px;right:-28px;
+  background:linear-gradient(135deg,var(--blue2),var(--cyan));
+  color:#000;font-size:10px;font-weight:800;letter-spacing:1px;
+  padding:5px 40px;transform:rotate(45deg)
+}
+.price-val{font-family:var(--mono);font-size:36px;font-weight:600;color:#fff;margin:12px 0 6px}
+.price-period{font-size:13px;color:var(--muted)}
+.price-features{list-style:none;margin-top:20px}
+.price-features li{
+  padding:8px 0;border-bottom:1px solid var(--border2);
+  font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px
+}
+.price-features li:last-child{border-bottom:none}
+.price-features li::before{content:'✓';color:var(--green);font-weight:700}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--surface);border-top:1px solid var(--border);
+  padding:32px 36px;text-align:center;color:var(--muted);font-size:13px
+}
+footer a{color:var(--blue);text-decoration:none;transition:.2s}
+footer a:hover{color:var(--cyan)}
+
+/* ── AUTH ── */
+#auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:48px 16px}
+.auth-wrap{width:100%;max-width:440px}
+.auth-logo{text-align:center;margin-bottom:36px}
+.auth-logo .big-icon{
+  width:64px;height:64px;border-radius:18px;margin:0 auto 16px;
+  background:linear-gradient(135deg,var(--blue2),var(--cyan));
+  display:flex;align-items:center;justify-content:center;font-size:30px;
+  box-shadow:0 0 32px rgba(79,163,255,0.4),0 0 60px rgba(79,163,255,0.15)
+}
+.auth-logo h2{font-family:var(--head);font-size:24px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.auth-logo p{font-size:14px;color:var(--muted);margin-top:5px}
+.auth-tabs{display:flex;background:var(--surface);border-radius:12px;padding:4px;margin-bottom:24px;border:1px solid var(--border2)}
+.auth-tab{
+  flex:1;padding:10px;border:none;background:transparent;
+  color:var(--muted);font-family:var(--ui);font-size:14px;font-weight:600;
+  cursor:pointer;border-radius:9px;transition:.2s
+}
+.auth-tab.active{background:var(--card);color:#fff;box-shadow:0 2px 12px rgba(0,0,0,0.4)}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:30px}
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.form-input{
+  width:100%;padding:12px 16px;
+  background:rgba(0,0,0,0.35);border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:var(--ui);font-size:14px;outline:none;transition:.22s
+}
+.form-input:focus{border-color:var(--blue);background:rgba(0,0,0,0.5);box-shadow:0 0 0 3px rgba(79,163,255,0.1)}
+.form-input::placeholder{color:var(--muted)}
+.form-select{
+  width:100%;padding:12px 16px;
+  background:rgba(0,0,0,0.35);border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:var(--ui);font-size:14px;outline:none;cursor:pointer;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%235c7a9e' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+  transition:.22s
+}
+.form-select:focus{border-color:var(--blue);outline:none}
+.form-select option{background:#0d1526}
+
+/* ── DASHBOARD ── */
+#dashboard{display:none}
+#dashboard.active{display:block}
+.dash-layout{display:flex;min-height:calc(100vh - 68px)}
+.sidebar{
+  width:248px;min-height:calc(100vh - 68px);
+  background:var(--surface);border-right:1px solid var(--border);
+  padding:22px 14px;flex-shrink:0;
+  position:sticky;top:68px;height:calc(100vh - 68px);overflow-y:auto
+}
+.sidebar-section{margin-bottom:26px}
+.sidebar-label{font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);padding:0 12px;margin-bottom:8px}
+.sidebar-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 14px;border-radius:10px;
+  color:var(--muted);font-size:14px;font-weight:500;
+  cursor:pointer;transition:.18s;margin-bottom:2px;
+  border:none;background:transparent;width:100%;text-align:left
+}
+.sidebar-item:hover{background:rgba(79,163,255,0.07);color:var(--text)}
+.sidebar-item.active{background:rgba(79,163,255,0.12);color:var(--blue)}
+.sidebar-item .si-icon{font-size:16px;width:22px;text-align:center}
+.sidebar-balance{
+  background:linear-gradient(135deg,rgba(79,163,255,0.12),rgba(0,229,212,0.07));
+  border:1px solid rgba(79,163,255,0.18);border-radius:13px;padding:18px;margin-bottom:22px
+}
+.sb-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.sb-val{font-family:var(--mono);font-size:24px;font-weight:600;color:#fff}
+.sb-earn{font-size:12px;color:var(--green);margin-top:4px}
+
+.main-content{flex:1;padding:32px 36px;overflow-x:hidden}
+.page-title{font-family:var(--head);font-size:24px;font-weight:800;color:#fff;margin-bottom:5px;letter-spacing:-.5px}
+.page-sub{font-size:14px;color:var(--muted);margin-bottom:30px}
+
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:var(--radius);padding:22px;
+  display:flex;flex-direction:column;gap:10px;transition:.2s
+}
+.stat-card:hover{border-color:var(--border);transform:translateY(-1px)}
+.stat-top{display:flex;align-items:center;justify-content:space-between}
+.stat-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px}
+.stat-change{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;font-family:var(--mono)}
+.stat-change.up{background:rgba(0,214,143,0.12);color:var(--green)}
+.stat-change.down{background:rgba(255,68,102,0.12);color:var(--red)}
+.stat-change.flat{background:rgba(92,122,158,0.15);color:var(--muted)}
+.stat-value{font-family:var(--mono);font-size:26px;font-weight:600;color:#fff}
+.stat-label{font-size:12px;color:var(--muted);font-weight:500}
+
+/* ── PANEL ── */
+.panel{background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);padding:24px;margin-bottom:22px}
+.panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.panel-title{font-family:var(--head);font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;gap:9px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:glow-pulse 1.8s ease-in-out infinite}
+
+/* ── TABLE ── */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:10px 16px;border-bottom:1px solid var(--border2);text-align:left}
+.data-table td{padding:13px 16px;border-bottom:1px solid rgba(17,29,53,0.8);font-size:13px;vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(79,163,255,0.03)}
+
+/* ── STATUS BADGES ── */
+.status{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px;display:inline-block}
+.status-success{background:rgba(0,214,143,0.12);color:var(--green)}
+.status-pending{background:rgba(255,204,0,0.12);color:var(--amber)}
+.status-failed{background:rgba(255,68,102,0.12);color:var(--red)}
+.status-active{background:rgba(79,163,255,0.12);color:var(--blue)}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;margin-bottom:22px}
+
+/* ── ORDER CARDS ── */
+.order-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:22px}
+.order-card{
+  background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);
+  padding:22px;cursor:pointer;transition:.25s
+}
+.order-card:hover{border-color:rgba(79,163,255,0.25);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.3)}
+.order-card.selected{border-color:var(--blue);background:rgba(79,163,255,0.07)}
+.oc-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:14px}
+.oc-title{font-family:var(--head);font-size:14px;font-weight:700;color:#fff;margin-bottom:5px}
+.oc-price{font-family:var(--mono);font-size:13px;color:var(--green);font-weight:500;margin-bottom:5px}
+.oc-desc{font-size:12px;color:var(--muted)}
+
+/* ── CHART ── */
+.chart-area{display:flex;align-items:flex-end;gap:8px;height:130px;padding-top:12px}
+.cb-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.cb-bar{width:100%;border-radius:5px 5px 0 0;min-height:4px;transition:.6s ease}
+.cb-lbl{font-size:10px;color:var(--muted)}
+.cb-val{font-size:10px;color:var(--text);font-family:var(--mono)}
+
+/* ── PROGRESS ── */
+.progress-bar{height:5px;background:var(--faint);border-radius:3px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue2),var(--cyan))}
+
+/* ── REF BOX ── */
+.ref-box{
+  background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:10px;
+  padding:14px 18px;font-family:var(--mono);font-size:13px;color:var(--cyan);
+  display:flex;align-items:center;justify-content:space-between;gap:10px
+}
+
+/* ── NOTIF ── */
+.notif-item{display:flex;gap:14px;padding:15px 0;border-bottom:1px solid var(--border2)}
+.notif-item:last-child{border-bottom:none}
+.notif-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.notif-text{font-size:13px;color:var(--text);line-height:1.55}
+.notif-time{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* ── ADMIN ── */
+#admin-panel{display:none}
+#admin-panel.active{display:block}
+.admin-layout{display:flex;min-height:calc(100vh - 68px)}
+.admin-sidebar{
+  width:228px;background:rgba(4,7,14,0.95);border-right:1px solid var(--border);
+  padding:18px 12px;flex-shrink:0;
+  position:sticky;top:68px;height:calc(100vh - 68px);overflow-y:auto
+}
+.admin-tag{
+  display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;
+  background:rgba(255,68,102,0.12);color:var(--red);font-size:11px;font-weight:700;
+  letter-spacing:1px;margin:0 12px 18px;border:1px solid rgba(255,68,102,0.2)
+}
+.admin-main{flex:1;padding:32px 36px;overflow-x:hidden}
+
+/* ── MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);
+  z-index:500;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:.25s
+}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{
+  background:var(--card);border:1px solid var(--border);border-radius:18px;
+  padding:30px;width:100%;max-width:470px;
+  transform:scale(.94) translateY(14px);transition:.25s;
+  max-height:90vh;overflow-y:auto
+}
+.modal-overlay.open .modal{transform:scale(1) translateY(0)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.modal-title{font-family:var(--head);font-size:18px;font-weight:700;color:#fff}
+.modal-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:8px;transition:.18s}
+.modal-close:hover{color:var(--text);background:var(--faint)}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:28px;right:28px;z-index:999;
+  background:var(--card);border:1px solid var(--border);border-radius:13px;
+  padding:14px 20px;font-size:13px;font-weight:600;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.5);
+  transform:translateY(90px);opacity:0;transition:.35s cubic-bezier(.34,1.56,.64,1);pointer-events:none
+}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.success{color:var(--green);border-color:rgba(0,214,143,0.25)}
+#toast.error{color:var(--red);border-color:rgba(255,68,102,0.25)}
+#toast.info{color:var(--blue);border-color:rgba(79,163,255,0.25)}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeup{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeup .42s ease both}
+
+/* ── MISC ── */
+.divider{border:none;border-top:1px solid var(--border2);margin:22px 0}
+.user-row{display:flex;align-items:center;gap:10px}
+.mini-avatar{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--blue2),var(--purple));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.action-btns{display:flex;gap:6px}
+
+.text-green{color:var(--green)}.text-red{color:var(--red)}.text-blue{color:var(--blue)}.text-amber{color:var(--amber)}.text-cyan{color:var(--cyan)}.text-muted{color:var(--muted)}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--faint);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(79,163,255,0.2)}
+
+/* ── TESTIMONIAL ── */
+.testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:50px}
+.testi-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);padding:26px}
+.testi-stars{color:var(--amber);font-size:14px;margin-bottom:12px}
+.testi-text{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px}
+.testi-name{font-weight:600;color:#fff;font-size:13px}
+.testi-uni{font-size:12px;color:var(--muted)}
+
+@media(max-width:900px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .services-grid{grid-template-columns:1fr 1fr}
+  .steps-grid{grid-template-columns:1fr 1fr}
+  .pricing-grid{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .admin-sidebar{display:none}
+  .two-col,.three-col{grid-template-columns:1fr}
+  .order-grid{grid-template-columns:1fr 1fr}
+  .testimonials{grid-template-columns:1fr}
+  .hero h1{letter-spacing:-1px}
+}
+</style>
+</head>
+<body>
+
+<div id="toast">✓ Done</div>
+
+<!-- ============================== LANDING ============================== -->
+<div class="page active" id="landing">
+  <nav class="navbar">
+    <div class="brand" onclick="showPage('landing')">
+      <div class="brand-icon">🤖</div>
+      <div class="brand-name">ASG <span>Robot</span></div>
+    </div>
+    <div class="nav-center">
+      <button class="nav-link" onclick="document.getElementById('services-sec').scrollIntoView({behavior:'smooth'})">Services</button>
+      <button class="nav-link" onclick="document.getElementById('how-sec').scrollIntoView({behavior:'smooth'})">How It Works</button>
+      <button class="nav-link" onclick="document.getElementById('pricing-sec').scrollIntoView({behavior:'smooth'})">Pricing</button>
+      <button class="nav-link" onclick="document.getElementById('testi-sec').scrollIntoView({behavior:'smooth'})">Reviews</button>
+    </div>
+    <div class="nav-right">
+      <button class="btn btn-outline btn-sm" onclick="openAuth('login')">Login</button>
+      <button class="btn btn-primary btn-sm" onclick="openAuth('register')">Get Started Free →</button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-badge"><div class="pulse"></div> 100% Free · No Credit Card · For Students</div>
+    <h1>Earn While You<br><span class="grad">Study & Grow</span></h1>
+    <p>ASG Robot connects students with affordable digital services — social media growth, content writing, data entry & more. Earn pocket money doing what you already know.</p>
+    <div class="hero-btns">
+      <button class="btn btn-primary" onclick="openAuth('register')">Start Earning Free →</button>
+      <button class="btn btn-outline" onclick="document.getElementById('services-sec').scrollIntoView({behavior:'smooth'})">Browse Services</button>
+    </div>
+  </div>
+
+  <div class="stats-strip">
+    <div class="strip-item"><div class="strip-val"><span>2,400+</span></div><div class="strip-label">Active Students</div></div>
+    <div class="strip-item"><div class="strip-val"><span>$48K</span></div><div class="strip-label">Total Paid Out</div></div>
+    <div class="strip-item"><div class="strip-val"><span>12,000+</span></div><div class="strip-label">Orders Completed</div></div>
+    <div class="strip-item"><div class="strip-val"><span>4.9 ★</span></div><div class="strip-label">Average Rating</div></div>
+  </div>
+
+  <!-- Services -->
+  <div class="section" id="services-sec">
+    <div class="section-label">What We Offer</div>
+    <div class="section-title">Affordable Digital Services</div>
+    <div class="section-sub">Professional services fulfilled by our student community — at prices that actually make sense.</div>
+    <div class="services-grid">
+      <div class="service-card" onclick="openAuth('register')">
+        <div class="svc-icon" style="background:rgba(79,163,255,0.12)">📱</div>
+        <div class="svc-title">Social Media Growth</div>
+        <div class="svc-desc">Real followers, likes & engagement on Instagram, TikTok, YouTube & more platforms.</div>
+        <div class="svc-price">Starting from $0.50</div>
+      </div>
+      <div class="service-card" onclick="openAuth('register')">
+        <div class="svc-icon" style="background:rgba(0,229,212,0.12)">✍️</div>
+        <div class="svc-title">Content Writing</div>
+        <div class="svc-desc">Blog posts, product descriptions, social captions — written by talented students.</div>
+        <div class="svc-price">Starting from $1.00</div>
+      </div>
+      <div class="service-card" onclick="openAuth('register')">
+        <div class="svc-icon" style="background:rgba(0,214,143,0.12)">📊</div>
+        <div class="svc-title">Data Entry & Research</div>
+        <div class="svc-desc">Spreadsheet filling, web research, lead generation at unbeatable student rates.</div>
+        <div class="svc-price">Starting from $2.00</div>
+      </div>
+      <div class="service-card" onclick="openAuth('register')">
+        <div class="svc-icon" style="background:rgba(168,85,247,0.12)">🎨</div>
+        <div class="svc-title">Graphic Design</div>
+        <div class="svc-desc">Logos, banners, social templates & presentations by design students.</div>
+        <div class="svc-price">Starting from $3.00</div>
+      </div>
+      <div class="service-card" onclick="openAuth('register')">
+        <div class="svc-icon" style="background:rgba(255,204,0,0.12)">🌐</div>
+        <div class="svc-title">Website Reviews</div>
+        <div class="svc-desc">Get real user feedback & UX reviews from fresh eyes on your website.</div>
+        <div class="svc-price">Starting from $1.50</div>
+      </div>
+      <div class="service-card" onclick="openAuth('register')">
+        <div class="svc-icon" style="background:rgba(255,68,102,0.12)">💬</div>
+        <div class="svc-title">Translation</div>
+        <div class="svc-desc">Documents, posts & messages translated by multilingual students.</div>
+        <div class="svc-price">Starting from $2.00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div class="section" id="how-sec">
+      <div class="section-label">Process</div>
+      <div class="section-title">Simple 4-Step Process</div>
+      <div class="section-sub">Start earning or getting services in minutes — no experience needed.</div>
+      <div class="steps-grid">
+        <div class="step-card"><div class="step-num">01</div><div class="step-title">Register Free</div><div class="step-desc">Create your account in 30 seconds — no credit card, no fees.</div></div>
+        <div class="step-card"><div class="step-num">02</div><div class="step-title">Pick a Service</div><div class="step-desc">Choose from our catalog or list your own skills to offer others.</div></div>
+        <div class="step-card"><div class="step-num">03</div><div class="step-title">Deposit or Earn</div><div class="step-desc">Fund your wallet to buy services, or complete tasks to earn money.</div></div>
+        <div class="step-card"><div class="step-num">04</div><div class="step-title">Withdraw Anytime</div><div class="step-desc">Cash out instantly to bKash, Nagad, Rocket or bank transfer.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing -->
+  <div class="section" id="pricing-sec">
+    <div class="section-label">Pricing</div>
+    <div class="section-title">Always Student-Friendly</div>
+    <div class="section-sub">Prices designed for students — because we know the budget is tight.</div>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="section-label" style="margin-bottom:8px">Free</div>
+        <div class="price-val">$0</div>
+        <div class="price-period">forever, no tricks</div>
+        <ul class="price-features" style="margin-top:22px">
+          <li>5 orders per month</li>
+          <li>All service categories</li>
+          <li>Affiliate/referral link</li>
+          <li>Dashboard access</li>
+          <li>bKash / Nagad withdrawal</li>
+        </ul>
+        <button class="btn btn-outline btn-full" style="margin-top:24px" onclick="openAuth('register')">Get Started</button>
+      </div>
+      <div class="price-card featured">
+        <div class="section-label" style="margin-bottom:8px;color:var(--cyan)">Pro</div>
+        <div class="price-val">$2.99</div>
+        <div class="price-period">per month</div>
+        <ul class="price-features" style="margin-top:22px">
+          <li>Unlimited orders</li>
+          <li>Priority support 24/7</li>
+          <li>Higher referral bonus ($2)</li>
+          <li>API access</li>
+          <li>Advanced analytics</li>
+        </ul>
+        <button class="btn btn-primary btn-full" style="margin-top:24px" onclick="openAuth('register')">Start Pro Trial</button>
+      </div>
+      <div class="price-card">
+        <div class="section-label" style="margin-bottom:8px">University</div>
+        <div class="price-val">Custom</div>
+        <div class="price-period">contact us</div>
+        <ul class="price-features" style="margin-top:22px">
+          <li>Bulk pricing</li>
+          <li>Campus ambassador program</li>
+          <li>Custom integration</li>
+          <li>Dedicated account manager</li>
+          <li>White-label option</li>
+        </ul>
+        <button class="btn btn-outline btn-full" style="margin-top:24px" onclick="toast('We will contact you soon!','info')">Contact Us</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimonials -->
+  <div style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="section" id="testi-sec">
+    <div class="section-label">Reviews</div>
+    <div class="section-title">Students Love ASG Robot</div>
+    <div class="section-sub">Real feedback from our student community across Bangladesh.</div>
+    <div class="testimonials">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"I earned over $150 in my first month just by referring friends and doing a few data entry tasks. Best side income for a student!"</div>
+        <div class="testi-name">Rashed K.</div>
+        <div class="testi-uni">BUET · Computer Science</div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"Ordered social media growth for my small business. Delivered faster than expected and the quality was surprisingly good. 10/10."</div>
+        <div class="testi-name">Nusrat J.</div>
+        <div class="testi-uni">DU · Business Administration</div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★☆</div>
+        <div class="testi-text">"The affiliate program is genuinely worth it. Just shared my link in our department group and got 12 referrals in a week!"</div>
+        <div class="testi-name">Mehedi H.</div>
+        <div class="testi-uni">NSU · Marketing</div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- CTA -->
+  <div style="text-align:center;padding:90px 24px">
+    <div class="section-label" style="text-align:center">Ready?</div>
+    <h2 style="font-family:var(--head);font-size:clamp(28px,4vw,48px);font-weight:800;color:#fff;margin:12px 0 18px;letter-spacing:-1px">Join 2,400+ Students Today</h2>
+    <p style="color:var(--muted);max-width:440px;margin:0 auto 36px;line-height:1.7">Free to join. No hidden fees. Start earning or get services in under 2 minutes.</p>
+    <button class="btn btn-primary" style="padding:14px 36px;font-size:16px" onclick="openAuth('register')">Create Free Account →</button>
+  </div>
+
+  <footer>
+    <div style="margin-bottom:10px">🤖 <strong style="color:#fff">ASG Robot</strong> — Built for Students, by Students</div>
+    <div>© 2025 ASG Robot. All rights reserved. &nbsp;·&nbsp; <a href="#">Privacy Policy</a> &nbsp;·&nbsp; <a href="#">Terms of Service</a> &nbsp;·&nbsp; <a href="#">Contact</a></div>
+  </footer>
+</div>
+
+<!-- ============================== AUTH ============================== -->
+<div class="page" id="auth">
+  <div class="auth-wrap">
+    <div class="auth-logo">
+      <div class="big-icon">🤖</div>
+      <h2>ASG Robot</h2>
+      <p>Student Earning Platform</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+      <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+    </div>
+    <div id="form-login">
+      <div class="auth-card">
+        <div class="form-group">
+          <label class="form-label">Username or Email</label>
+          <input class="form-input" type="text" placeholder="Enter your username" id="li-user">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" placeholder="••••••••" id="li-pass">
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doLogin()" style="margin-top:6px">Login to Dashboard →</button>
+        <div style="text-align:center;margin-top:18px">
+          <span style="color:var(--muted);font-size:13px">Admin access: <strong style="color:var(--blue);cursor:pointer" onclick="doAdminLogin()">admin / admin123</strong></span>
+        </div>
+      </div>
+    </div>
+    <div id="form-register" style="display:none">
+      <div class="auth-card">
+        <div class="two-col" style="margin-bottom:0">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input class="form-input" type="text" placeholder="Your name" id="reg-name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input class="form-input" type="text" placeholder="Choose username" id="reg-user">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" placeholder="student@university.edu" id="reg-email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" placeholder="Min 6 characters" id="reg-pass">
+        </div>
+        <div class="form-group">
+          <label class="form-label">University / College</label>
+          <input class="form-input" type="text" placeholder="e.g. BUET, DU, NSU..." id="reg-uni">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Referral Code (optional)</label>
+          <input class="form-input" type="text" placeholder="Friend's username" id="reg-ref">
+        </div>
+        <button class="btn btn-green btn-full" onclick="doRegister()">Create Free Account 🎉</button>
+        <div style="text-align:center;margin-top:13px;font-size:12px;color:var(--muted)">By registering you agree to our Terms & Privacy Policy</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:18px">
+      <button class="btn btn-outline btn-sm" onclick="showPage('landing')">← Back to Home</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== DASHBOARD ============================== -->
+<div class="page" id="dashboard">
+  <nav class="navbar">
+    <div class="brand" onclick="showPage('landing')">
+      <div class="brand-icon">🤖</div>
+      <div class="brand-name">ASG <span>Robot</span></div>
+    </div>
+    <div class="nav-center">
+      <button class="nav-link active" id="d-nav-home" onclick="showDashTab('home',this)">Home</button>
+      <button class="nav-link" id="d-nav-services" onclick="showDashTab('services',this)">Services</button>
+      <button class="nav-link" id="d-nav-orders" onclick="showDashTab('orders',this)">Orders</button>
+      <button class="nav-link" id="d-nav-wallet" onclick="showDashTab('wallet',this)">Wallet</button>
+      <button class="nav-link" id="d-nav-affiliate" onclick="showDashTab('affiliate',this)">Affiliate</button>
+    </div>
+    <div class="nav-right">
+      <span class="badge-notif" id="d-balance-nav">$0.00</span>
+      <div class="avatar" id="d-avatar" onclick="showDashTab('profile',document.getElementById('d-nav-home'))">U</div>
+      <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+  <div class="dash-layout">
+    <div class="sidebar">
+      <div class="sidebar-balance">
+        <div class="sb-label">Wallet Balance</div>
+        <div class="sb-val" id="sb-balance">$0.00</div>
+        <div class="sb-earn" id="sb-earn">+$0.00 earnings</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Main</div>
+        <button class="sidebar-item active" id="si-home" onclick="showDashTab('home',this)"><span class="si-icon">🏠</span> Dashboard</button>
+        <button class="sidebar-item" id="si-services" onclick="showDashTab('services',this)"><span class="si-icon">🛒</span> Order Services</button>
+        <button class="sidebar-item" id="si-orders" onclick="showDashTab('orders',this)"><span class="si-icon">📦</span> My Orders</button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Finance</div>
+        <button class="sidebar-item" id="si-wallet" onclick="showDashTab('wallet',this)"><span class="si-icon">💳</span> Wallet</button>
+        <button class="sidebar-item" id="si-affiliate" onclick="showDashTab('affiliate',this)"><span class="si-icon">👥</span> Affiliate</button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Account</div>
+        <button class="sidebar-item" id="si-profile" onclick="showDashTab('profile',this)"><span class="si-icon">⚙️</span> Profile</button>
+        <button class="sidebar-item" onclick="logout()"><span class="si-icon">🚪</span> Logout</button>
+      </div>
+    </div>
+    <div class="main-content">
+
+      <!-- HOME -->
+      <div id="dt-home">
+        <div class="page-title" id="d-welcome">Welcome back! 👋</div>
+        <div class="page-sub">Here's your activity overview</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-top"><div class="stat-icon" style="background:rgba(79,163,255,0.12)">💰</div><span class="stat-change up">Active</span></div>
+            <div class="stat-value" id="sc-balance">$0.00</div>
+            <div class="stat-label">Wallet Balance</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top"><div class="stat-icon" style="background:rgba(0,214,143,0.12)">📈</div><span class="stat-change up">+$1/ref</span></div>
+            <div class="stat-value" id="sc-earn">$0.00</div>
+            <div class="stat-label">Total Earnings</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top"><div class="stat-icon" style="background:rgba(255,204,0,0.12)">📦</div><span class="stat-change flat" id="orders-count-badge">0 total</span></div>
+            <div class="stat-value" id="sc-orders">0</div>
+            <div class="stat-label">Orders Placed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top"><div class="stat-icon" style="background:rgba(168,85,247,0.12)">👥</div><span class="stat-change up">$1 each</span></div>
+            <div class="stat-value" id="sc-refs">0</div>
+            <div class="stat-label">Referrals</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><div class="live-dot"></div> Weekly Earnings</div>
+              <span style="font-size:12px;color:var(--muted)">Last 7 days</span>
+            </div>
+            <div class="chart-area">
+              <div class="cb-wrap"><div class="cb-val">$2</div><div class="cb-bar" style="height:28px;background:linear-gradient(180deg,var(--blue),rgba(79,163,255,0.2))"></div><div class="cb-lbl">Mon</div></div>
+              <div class="cb-wrap"><div class="cb-val">$5</div><div class="cb-bar" style="height:56px;background:linear-gradient(180deg,var(--cyan),rgba(0,229,212,0.2))"></div><div class="cb-lbl">Tue</div></div>
+              <div class="cb-wrap"><div class="cb-val">$3</div><div class="cb-bar" style="height:38px;background:linear-gradient(180deg,var(--blue),rgba(79,163,255,0.2))"></div><div class="cb-lbl">Wed</div></div>
+              <div class="cb-wrap"><div class="cb-val">$8</div><div class="cb-bar" style="height:88px;background:linear-gradient(180deg,var(--green),rgba(0,214,143,0.2))"></div><div class="cb-lbl">Thu</div></div>
+              <div class="cb-wrap"><div class="cb-val">$4</div><div class="cb-bar" style="height:46px;background:linear-gradient(180deg,var(--cyan),rgba(0,229,212,0.2))"></div><div class="cb-lbl">Fri</div></div>
+              <div class="cb-wrap"><div class="cb-val">$11</div><div class="cb-bar" style="height:110px;background:linear-gradient(180deg,var(--blue),rgba(79,163,255,0.2))"></div><div class="cb-lbl">Sat</div></div>
+              <div class="cb-wrap"><div class="cb-val">$6</div><div class="cb-bar" style="height:66px;background:linear-gradient(180deg,var(--purple),rgba(168,85,247,0.2))"></div><div class="cb-lbl">Sun</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">🔔 Notifications</div></div>
+            <div class="notif-item">
+              <div class="notif-icon" style="background:rgba(0,214,143,0.12)">✅</div>
+              <div><div class="notif-text">Order #1042 completed successfully</div><div class="notif-time">2 hours ago</div></div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon" style="background:rgba(79,163,255,0.12)">💰</div>
+              <div><div class="notif-text">Deposit of $20.00 approved by admin</div><div class="notif-time">Yesterday</div></div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon" style="background:rgba(168,85,247,0.12)">👥</div>
+              <div><div class="notif-text">New referral: <strong>student_xyz</strong> joined with your link</div><div class="notif-time">2 days ago</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📦 Recent Orders</div>
+            <button class="btn btn-outline btn-xs" onclick="showDashTab('orders',document.getElementById('si-orders'))">View All</button>
+          </div>
+          <table class="data-table" id="home-orders-table">
+            <thead><tr><th>#</th><th>Service</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:28px">No orders yet. <a href="#" onclick="showDashTab('services',document.getElementById('si-services'));return false" style="color:var(--blue)">Browse services →</a></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SERVICES -->
+      <div id="dt-services" style="display:none">
+        <div class="page-title">Browse Services 🛒</div>
+        <div class="page-sub">Select a service and place your order instantly</div>
+        <div class="order-grid">
+          <div class="order-card" onclick="openOrderModal('Social Media Followers','0.50','📱','Get real followers on Instagram, TikTok or YouTube')"><div class="oc-icon" style="background:rgba(79,163,255,0.12)">📱</div><div class="oc-title">Social Media Followers</div><div class="oc-price">From $0.50 / 100</div><div class="oc-desc">Real & active followers</div></div>
+          <div class="order-card" onclick="openOrderModal('Post Likes','0.20','❤️','Boost likes on your posts across all platforms')"><div class="oc-icon" style="background:rgba(255,68,102,0.12)">❤️</div><div class="oc-title">Post Likes / Reactions</div><div class="oc-price">From $0.20 / 100</div><div class="oc-desc">Instant delivery</div></div>
+          <div class="order-card" onclick="openOrderModal('Content Writing','1.00','✍️','Blog posts, articles, social captions')"><div class="oc-icon" style="background:rgba(0,229,212,0.12)">✍️</div><div class="oc-title">Content Writing</div><div class="oc-price">From $1.00 / 500 words</div><div class="oc-desc">SEO-optimized</div></div>
+          <div class="order-card" onclick="openOrderModal('Data Entry','2.00','📊','Spreadsheet filling, research, lead gen')"><div class="oc-icon" style="background:rgba(0,214,143,0.12)">📊</div><div class="oc-title">Data Entry</div><div class="oc-price">From $2.00 / task</div><div class="oc-desc">Fast & accurate</div></div>
+          <div class="order-card" onclick="openOrderModal('Graphic Design','3.00','🎨','Logo, banner, poster, social templates')"><div class="oc-icon" style="background:rgba(168,85,247,0.12)">🎨</div><div class="oc-title">Graphic Design</div><div class="oc-price">From $3.00 / design</div><div class="oc-desc">Professional quality</div></div>
+          <div class="order-card" onclick="openOrderModal('Translation','2.00','💬','Document & content translation')"><div class="oc-icon" style="background:rgba(255,204,0,0.12)">💬</div><div class="oc-title">Translation</div><div class="oc-price">From $2.00 / 500 words</div><div class="oc-desc">30+ languages</div></div>
+          <div class="order-card" onclick="openOrderModal('YouTube Views','0.80','▶️','Real views to boost your video ranking')"><div class="oc-icon" style="background:rgba(255,68,102,0.12)">▶️</div><div class="oc-title">YouTube Views</div><div class="oc-price">From $0.80 / 1000</div><div class="oc-desc">Watch time included</div></div>
+          <div class="order-card" onclick="openOrderModal('Website Review','1.50','🌐','Detailed UX feedback from real users')"><div class="oc-icon" style="background:rgba(0,229,212,0.12)">🌐</div><div class="oc-title">Website Review</div><div class="oc-price">From $1.50 / review</div><div class="oc-desc">Actionable insights</div></div>
+          <div class="order-card" onclick="openOrderModal('PDF to Excel','1.00','📄','Convert any PDF to editable spreadsheet')"><div class="oc-icon" style="background:rgba(0,214,143,0.12)">📄</div><div class="oc-title">PDF to Excel/Word</div><div class="oc-price">From $1.00 / file</div><div class="oc-desc">Fast turnaround</div></div>
+        </div>
+      </div>
+
+      <!-- ORDERS -->
+      <div id="dt-orders" style="display:none">
+        <div class="page-title">My Orders 📦</div>
+        <div class="page-sub">Track all your service orders</div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">All Orders</div>
+            <button class="btn btn-primary btn-xs" onclick="showDashTab('services',document.getElementById('si-services'))">+ New Order</button>
+          </div>
+          <table class="data-table" id="all-orders-table">
+            <thead><tr><th>Order #</th><th>Service</th><th>Details</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody id="orders-tbody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px">No orders yet</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- WALLET -->
+      <div id="dt-wallet" style="display:none">
+        <div class="page-title">Wallet 💳</div>
+        <div class="page-sub">Manage deposits, withdrawals & transactions</div>
+        <div class="three-col">
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(79,163,255,0.12)">💳</div></div><div class="stat-value" id="w-balance">$0.00</div><div class="stat-label">Available Balance</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(0,214,143,0.12)">📥</div></div><div class="stat-value" id="w-deposits">$0.00</div><div class="stat-label">Total Deposited</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,68,102,0.12)">📤</div></div><div class="stat-value" id="w-withdrawn">$0.00</div><div class="stat-label">Total Withdrawn</div></div>
+        </div>
+        <div class="two-col">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">📥 Deposit Funds</div></div>
+            <div class="form-group"><label class="form-label">Amount (USD)</label><input class="form-input" type="number" placeholder="e.g. 10.00" id="dep-amount" min="1"></div>
+            <div class="form-group"><label class="form-label">Payment Method</label><select class="form-select" id="dep-method"><option>bKash</option><option>Nagad</option><option>Rocket</option><option>Bank Transfer</option><option>PayPal</option></select></div>
+            <div class="form-group"><label class="form-label">Transaction ID / Reference</label><input class="form-input" type="text" placeholder="Paste your TXN ID" id="dep-txn"></div>
+            <button class="btn btn-green btn-full" onclick="submitDeposit()">Submit Deposit Request</button>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">📤 Withdraw Funds</div></div>
+            <div class="form-group"><label class="form-label">Amount (USD)</label><input class="form-input" type="number" placeholder="Min $5.00" id="wd-amount" min="5"></div>
+            <div class="form-group"><label class="form-label">Method</label><select class="form-select" id="wd-method"><option>bKash</option><option>Nagad</option><option>Rocket</option><option>Bank Transfer</option><option>PayPal</option></select></div>
+            <div class="form-group"><label class="form-label">Account Number</label><input class="form-input" type="text" placeholder="Your bKash/bank number" id="wd-account"></div>
+            <button class="btn btn-red btn-full" onclick="submitWithdraw()">Request Withdrawal</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Transaction History</div></div>
+          <table class="data-table"><thead><tr><th>Type</th><th>Method</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody id="txn-history"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:28px">No transactions yet</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- AFFILIATE -->
+      <div id="dt-affiliate" style="display:none">
+        <div class="page-title">Affiliate Program 👥</div>
+        <div class="page-sub">Earn $1.00 for every friend who joins with your link</div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(168,85,247,0.12)">👥</div></div><div class="stat-value" id="aff-total">0</div><div class="stat-label">Total Referrals</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(0,214,143,0.12)">💵</div></div><div class="stat-value" id="aff-earned">$0.00</div><div class="stat-label">Affiliate Earnings</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(79,163,255,0.12)">📊</div><span class="stat-change up">This month</span></div><div class="stat-value" id="aff-month">0</div><div class="stat-label">Referrals This Month</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,204,0,0.12)">⏳</div></div><div class="stat-value" id="aff-pending">$0.00</div><div class="stat-label">Pending Payout</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">🔗 Your Referral Link</div></div>
+          <div class="ref-box" id="ref-link-box">
+            asg-robot.com/ref?code=<span id="ref-code-display">loading...</span>
+            <button class="btn btn-outline btn-xs" onclick="copyRef()">Copy Link</button>
+          </div>
+          <div style="margin-top:18px;font-size:13px;color:var(--muted)">Share on social media, WhatsApp groups, or with friends to earn $1 per registration!</div>
+          <div style="margin-top:22px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;font-size:13px">
+            <div style="background:var(--faint);border-radius:11px;padding:16px"><div style="font-size:20px;margin-bottom:9px">📢</div><strong style="color:#fff">Share in Groups</strong><div style="color:var(--muted);margin-top:5px;font-size:12px">Post in university WhatsApp & Facebook groups</div></div>
+            <div style="background:var(--faint);border-radius:11px;padding:16px"><div style="font-size:20px;margin-bottom:9px">🎓</div><strong style="color:#fff">Campus Ambassador</strong><div style="color:var(--muted);margin-top:5px;font-size:12px">Become a rep for extra bonuses</div></div>
+            <div style="background:var(--faint);border-radius:11px;padding:16px"><div style="font-size:20px;margin-bottom:9px">🌐</div><strong style="color:#fff">Social Media</strong><div style="color:var(--muted);margin-top:5px;font-size:12px">Post on Instagram/TikTok with your link</div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Referral History</div></div>
+          <table class="data-table"><thead><tr><th>Username</th><th>Joined</th><th>Bonus</th><th>Status</th></tr></thead><tbody id="ref-history"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:28px">No referrals yet. Share your link!</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div id="dt-profile" style="display:none">
+        <div class="page-title">Profile & Settings ⚙️</div>
+        <div class="page-sub">Manage your account information</div>
+        <div class="two-col">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Personal Info</div></div>
+            <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" type="text" id="prof-name"></div>
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="prof-email"></div>
+            <div class="form-group"><label class="form-label">University</label><input class="form-input" type="text" id="prof-uni"></div>
+            <button class="btn btn-primary btn-full" onclick="saveProfile()">Save Changes</button>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Change Password</div></div>
+            <div class="form-group"><label class="form-label">Current Password</label><input class="form-input" type="password" placeholder="••••••••"></div>
+            <div class="form-group"><label class="form-label">New Password</label><input class="form-input" type="password" placeholder="Min 6 chars"></div>
+            <div class="form-group"><label class="form-label">Confirm Password</label><input class="form-input" type="password" placeholder="Repeat new password"></div>
+            <button class="btn btn-outline btn-full" onclick="toast('Password updated!','success')">Update Password</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================== ADMIN ============================== -->
+<div class="page" id="admin-panel">
+  <nav class="navbar">
+    <div class="brand"><div class="brand-icon">🤖</div><div class="brand-name">ASG <span>Robot</span></div></div>
+    <div class="nav-center">
+      <button class="nav-link active" id="a-nav-overview" onclick="showAdminTab('overview',this)">Overview</button>
+      <button class="nav-link" id="a-nav-users" onclick="showAdminTab('users',this)">Users</button>
+      <button class="nav-link" id="a-nav-orders" onclick="showAdminTab('aorders',this)">Orders</button>
+      <button class="nav-link" id="a-nav-deposits" onclick="showAdminTab('deposits',this)">Deposits</button>
+      <button class="nav-link" id="a-nav-withdrawals" onclick="showAdminTab('withdrawals',this)">Withdrawals</button>
+      <button class="nav-link" id="a-nav-services" onclick="showAdminTab('aservices',this)">Services</button>
+    </div>
+    <div class="nav-right">
+      <span style="font-size:12px;color:var(--red);font-weight:700;padding:5px 14px;background:rgba(255,68,102,0.1);border-radius:20px;border:1px solid rgba(255,68,102,0.2)">🔐 ADMIN</span>
+      <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+  <div class="admin-layout">
+    <div class="admin-sidebar">
+      <div class="admin-tag">⚡ ROOT ACCESS</div>
+      <button class="sidebar-item active" id="asi-overview" onclick="showAdminTab('overview',this)"><span class="si-icon">📊</span> Overview</button>
+      <button class="sidebar-item" id="asi-users" onclick="showAdminTab('users',this)"><span class="si-icon">👤</span> Users</button>
+      <button class="sidebar-item" id="asi-aorders" onclick="showAdminTab('aorders',this)"><span class="si-icon">📦</span> Orders</button>
+      <button class="sidebar-item" id="asi-deposits" onclick="showAdminTab('deposits',this)"><span class="si-icon">📥</span> Deposits</button>
+      <button class="sidebar-item" id="asi-withdrawals" onclick="showAdminTab('withdrawals',this)"><span class="si-icon">📤</span> Withdrawals</button>
+      <button class="sidebar-item" id="asi-aservices" onclick="showAdminTab('aservices',this)"><span class="si-icon">🛒</span> Services</button>
+      <hr class="divider">
+      <button class="sidebar-item" onclick="showPage('landing')"><span class="si-icon">🌐</span> View Site</button>
+      <button class="sidebar-item" onclick="logout()"><span class="si-icon">🚪</span> Logout</button>
+    </div>
+    <div class="admin-main">
+
+      <!-- OVERVIEW -->
+      <div id="at-overview">
+        <div class="page-title">Admin Dashboard 📊</div>
+        <div class="page-sub" id="admin-clock-display">Loading...</div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(79,163,255,0.12)">👤</div><span class="stat-change up">+3 today</span></div><div class="stat-value" id="adm-users">24</div><div class="stat-label">Total Users</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(0,214,143,0.12)">📦</div><span class="stat-change up">+12 today</span></div><div class="stat-value" id="adm-orders">148</div><div class="stat-label">Total Orders</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,204,0,0.12)">💰</div><span class="stat-change up">+$24</span></div><div class="stat-value" id="adm-revenue">$4,820</div><div class="stat-label">Total Revenue</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:rgba(255,68,102,0.12)">⏳</div><span class="stat-change down">3 pending</span></div><div class="stat-value" id="adm-pending">$340</div><div class="stat-label">Pending Withdrawals</div></div>
+        </div>
+        <div class="two-col">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><div class="live-dot"></div> Revenue This Week</div></div>
+            <div class="chart-area">
+              <div class="cb-wrap"><div class="cb-val">$180</div><div class="cb-bar" style="height:38px;background:linear-gradient(180deg,var(--blue),rgba(79,163,255,0.2))"></div><div class="cb-lbl">Mon</div></div>
+              <div class="cb-wrap"><div class="cb-val">$320</div><div class="cb-bar" style="height:70px;background:linear-gradient(180deg,var(--cyan),rgba(0,229,212,0.2))"></div><div class="cb-lbl">Tue</div></div>
+              <div class="cb-wrap"><div class="cb-val">$210</div><div class="cb-bar" style="height:46px;background:linear-gradient(180deg,var(--blue),rgba(79,163,255,0.2))"></div><div class="cb-lbl">Wed</div></div>
+              <div class="cb-wrap"><div class="cb-val">$480</div><div class="cb-bar" style="height:106px;background:linear-gradient(180deg,var(--green),rgba(0,214,143,0.2))"></div><div class="cb-lbl">Thu</div></div>
+              <div class="cb-wrap"><div class="cb-val">$290</div><div class="cb-bar" style="height:62px;background:linear-gradient(180deg,var(--cyan),rgba(0,229,212,0.2))"></div><div class="cb-lbl">Fri</div></div>
+              <div class="cb-wrap"><div class="cb-val">$520</div><div class="cb-bar" style="height:114px;background:linear-gradient(180deg,var(--amber),rgba(255,204,0,0.2))"></div><div class="cb-lbl">Sat</div></div>
+              <div class="cb-wrap"><div class="cb-val">$390</div><div class="cb-bar" style="height:86px;background:linear-gradient(180deg,var(--purple),rgba(168,85,247,0.2))"></div><div class="cb-lbl">Sun</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">📋 Quick Actions</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <button class="btn btn-primary btn-full" onclick="showAdminTab('deposits',document.getElementById('asi-deposits'))">Review Pending Deposits (3)</button>
+              <button class="btn btn-amber btn-full" onclick="showAdminTab('withdrawals',document.getElementById('asi-withdrawals'))">Process Withdrawals (2)</button>
+              <button class="btn btn-outline btn-full" onclick="showAdminTab('users',document.getElementById('asi-users'))">View All Users</button>
+              <button class="btn btn-outline btn-full" onclick="showAdminTab('aorders',document.getElementById('asi-aorders'))">Manage Orders</button>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Recent Activity</div></div>
+          <table class="data-table">
+            <thead><tr><th>User</th><th>Action</th><th>Amount</th><th>Status</th><th>Time</th></tr></thead>
+            <tbody>
+              <tr><td><div class="user-row"><div class="mini-avatar">A</div>alice</div></td><td>Deposit</td><td class="text-green">$50.00</td><td><span class="status status-success">APPROVED</span></td><td>5 min ago</td></tr>
+              <tr><td><div class="user-row"><div class="mini-avatar">B</div>bob</div></td><td>Order #148</td><td>$5.00</td><td><span class="status status-active">PROCESSING</span></td><td>12 min ago</td></tr>
+              <tr><td><div class="user-row"><div class="mini-avatar">C</div>charlie</div></td><td>Withdraw</td><td class="text-red">$100.00</td><td><span class="status status-pending">PENDING</span></td><td>1 hr ago</td></tr>
+              <tr><td><div class="user-row"><div class="mini-avatar">D</div>diana</div></td><td>Register</td><td>—</td><td><span class="status status-success">JOINED</span></td><td>2 hr ago</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div id="at-users" style="display:none">
+        <div class="page-title">User Management 👤</div>
+        <div class="page-sub">View, edit and manage all registered users</div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">All Users (<span id="user-count">4</span>)</div>
+            <input class="form-input" style="width:200px;padding:9px 14px" type="text" placeholder="Search users..." oninput="filterUsers(this.value)">
+          </div>
+          <table class="data-table" id="users-table">
+            <thead><tr><th>User</th><th>Email</th><th>Balance</th><th>Earnings</th><th>Orders</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="users-tbody">
+              <tr><td><div class="user-row"><div class="mini-avatar">A</div><div><div style="color:#fff;font-weight:600">alice</div><div style="font-size:11px;color:var(--muted)">BUET</div></div></div></td><td style="color:var(--muted)">alice@buet.ac.bd</td><td class="text-green">$500.00</td><td class="text-cyan">$124.00</td><td>18</td><td><span class="status status-success">ACTIVE</span></td><td><div class="action-btns"><button class="btn btn-outline btn-xs" onclick="adminAdjustBalance('alice')">Balance</button><button class="btn btn-red btn-xs" onclick="toast('User suspended','info')">Suspend</button></div></td></tr>
+              <tr><td><div class="user-row"><div class="mini-avatar">B</div><div><div style="color:#fff;font-weight:600">bob</div><div style="font-size:11px;color:var(--muted)">DU</div></div></div></td><td style="color:var(--muted)">bob@du.ac.bd</td><td class="text-green">$250.00</td><td class="text-cyan">$48.00</td><td>9</td><td><span class="status status-success">ACTIVE</span></td><td><div class="action-btns"><button class="btn btn-outline btn-xs" onclick="adminAdjustBalance('bob')">Balance</button><button class="btn btn-red btn-xs" onclick="toast('User suspended','info')">Suspend</button></div></td></tr>
+              <tr><td><div class="user-row"><div class="mini-avatar">C</div><div><div style="color:#fff;font-weight:600">charlie</div><div style="font-size:11px;color:var(--muted)">NSU</div></div></div></td><td style="color:var(--muted)">charlie@nsu.ac.bd</td><td class="text-green">$1,000.00</td><td class="text-cyan">$310.00</td><td>44</td><td><span class="status status-success">ACTIVE</span></td><td><div class="action-btns"><button class="btn btn-outline btn-xs" onclick="adminAdjustBalance('charlie')">Balance</button><button class="btn btn-red btn-xs" onclick="toast('User suspended','info')">Suspend</button></div></td></tr>
+              <tr><td><div class="user-row"><div class="mini-avatar">D</div><div><div style="color:#fff;font-weight:600">diana</div><div style="font-size:11px;color:var(--muted)">IUT</div></div></div></td><td style="color:var(--muted)">diana@iut.ac.bd</td><td class="text-green">$75.00</td><td class="text-cyan">$12.00</td><td>3</td><td><span class="status status-pending">INACTIVE</span></td><td><div class="action-btns"><button class="btn btn-outline btn-xs" onclick="adminAdjustBalance('diana')">Balance</button><button class="btn btn-red btn-xs" onclick="toast('Action taken','info')">Suspend</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ADMIN ORDERS -->
+      <div id="at-aorders" style="display:none">
+        <div class="page-title">Orders Management 📦</div>
+        <div class="page-sub">Track and update all service orders</div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">All Orders</div>
+          <select class="form-select" style="width:160px;padding:8px 12px">
+            <option value="">All Status</option><option>Processing</option><option>Completed</option><option>Pending</option>
+          </select></div>
+          <table class="data-table">
+            <thead><tr><th>#</th><th>User</th><th>Service</th><th>Details</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>#148</td><td>bob</td><td>Social Media Followers</td><td>Instagram, 500</td><td>$2.50</td><td><span class="status status-active">PROCESSING</span></td><td><button class="btn btn-green btn-xs" onclick="toast('Order #148 marked complete','success')">Complete</button></td></tr>
+              <tr><td>#147</td><td>alice</td><td>Content Writing</td><td>Blog, 1000 words</td><td>$2.00</td><td><span class="status status-success">COMPLETED</span></td><td><button class="btn btn-outline btn-xs">View</button></td></tr>
+              <tr><td>#146</td><td>charlie</td><td>Graphic Design</td><td>Logo design</td><td>$3.00</td><td><span class="status status-success">COMPLETED</span></td><td><button class="btn btn-outline btn-xs">View</button></td></tr>
+              <tr><td>#145</td><td>diana</td><td>Data Entry</td><td>50 rows</td><td>$2.00</td><td><span class="status status-pending">PENDING</span></td><td><button class="btn btn-green btn-xs" onclick="toast('Order assigned','success')">Assign</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- DEPOSITS -->
+      <div id="at-deposits" style="display:none">
+        <div class="page-title">Deposits Management 📥</div>
+        <div class="page-sub">Review and approve deposit requests</div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Deposit Requests</div><span style="background:rgba(255,204,0,0.12);color:var(--amber);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid rgba(255,204,0,0.2)">3 PENDING</span></div>
+          <table class="data-table">
+            <thead><tr><th>User</th><th>Amount</th><th>Method</th><th>TXN ID</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>charlie</td><td class="text-green">$500.00</td><td>bKash</td><td>BK8294738</td><td>Today</td><td><span class="status status-pending">PENDING</span></td><td><div class="action-btns"><button class="btn btn-green btn-xs" onclick="approveDeposit(this,'charlie',500)">Approve</button><button class="btn btn-red btn-xs" onclick="toast('Deposit rejected','info');this.closest('tr').querySelector('.status').textContent='REJECTED';this.closest('tr').querySelector('.status').className='status status-failed'">Reject</button></div></td></tr>
+              <tr><td>alice</td><td class="text-green">$100.00</td><td>Nagad</td><td>NG5583920</td><td>Today</td><td><span class="status status-pending">PENDING</span></td><td><div class="action-btns"><button class="btn btn-green btn-xs" onclick="approveDeposit(this,'alice',100)">Approve</button><button class="btn btn-red btn-xs" onclick="toast('Deposit rejected','info')">Reject</button></div></td></tr>
+              <tr><td>bob</td><td class="text-green">$50.00</td><td>Bank</td><td>TRF002934</td><td>Yesterday</td><td><span class="status status-success">APPROVED</span></td><td>—</td></tr>
+              <tr><td>diana</td><td class="text-green">$20.00</td><td>Rocket</td><td>RK1293847</td><td>Yesterday</td><td><span class="status status-success">APPROVED</span></td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- WITHDRAWALS -->
+      <div id="at-withdrawals" style="display:none">
+        <div class="page-title">Withdrawals Management 📤</div>
+        <div class="page-sub">Process student withdrawal requests</div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Withdrawal Requests</div><span style="background:rgba(255,68,102,0.12);color:var(--red);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid rgba(255,68,102,0.2)">2 PENDING</span></div>
+          <table class="data-table">
+            <thead><tr><th>User</th><th>Amount</th><th>Method</th><th>Account</th><th>Requested</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>alice</td><td class="text-red">$100.00</td><td>bKash</td><td>01712345678</td><td>Today</td><td><span class="status status-pending">PENDING</span></td><td><div class="action-btns"><button class="btn btn-green btn-xs" onclick="toast('Withdrawal processed!','success');this.closest('tr').querySelector('.status').textContent='PAID';this.closest('tr').querySelector('.status').className='status status-success'">Mark Paid</button><button class="btn btn-red btn-xs" onclick="toast('Rejected','info')">Reject</button></div></td></tr>
+              <tr><td>diana</td><td class="text-red">$50.00</td><td>Nagad</td><td>01898765432</td><td>Today</td><td><span class="status status-pending">PENDING</span></td><td><div class="action-btns"><button class="btn btn-green btn-xs" onclick="toast('Withdrawal processed!','success');this.closest('tr').querySelector('.status').textContent='PAID';this.closest('tr').querySelector('.status').className='status status-success'">Mark Paid</button><button class="btn btn-red btn-xs" onclick="toast('Rejected','info')">Reject</button></div></td></tr>
+              <tr><td>charlie</td><td class="text-red">$200.00</td><td>Bank</td><td>BR293847</td><td>2 days ago</td><td><span class="status status-success">PAID</span></td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ADMIN SERVICES -->
+      <div id="at-aservices" style="display:none">
+        <div class="page-title">Services Management 🛒</div>
+        <div class="page-sub">Add, edit or remove available services</div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Active Services</div><button class="btn btn-primary btn-xs" onclick="openAddServiceModal()">+ Add Service</button></div>
+          <table class="data-table" id="admin-services-table">
+            <thead><tr><th>Icon</th><th>Service Name</th><th>Base Price</th><th>Orders</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td>📱</td><td>Social Media Followers</td><td class="text-mono">$0.50</td><td>42</td><td><span class="status status-success">ACTIVE</span></td><td><button class="btn btn-outline btn-xs" onclick="toast('Edit coming soon','info')">Edit</button></td></tr>
+              <tr><td>❤️</td><td>Post Likes / Reactions</td><td class="text-mono">$0.20</td><td>38</td><td><span class="status status-success">ACTIVE</span></td><td><button class="btn btn-outline btn-xs" onclick="toast('Edit coming soon','info')">Edit</button></td></tr>
+              <tr><td>✍️</td><td>Content Writing</td><td class="text-mono">$1.00</td><td>21</td><td><span class="status status-success">ACTIVE</span></td><td><button class="btn btn-outline btn-xs" onclick="toast('Edit coming soon','info')">Edit</button></td></tr>
+              <tr><td>📊</td><td>Data Entry</td><td class="text-mono">$2.00</td><td>17</td><td><span class="status status-success">ACTIVE</span></td><td><button class="btn btn-outline btn-xs" onclick="toast('Edit coming soon','info')">Edit</button></td></tr>
+              <tr><td>🎨</td><td>Graphic Design</td><td class="text-mono">$3.00</td><td>14</td><td><span class="status status-success">ACTIVE</span></td><td><button class="btn btn-outline btn-xs" onclick="toast('Edit coming soon','info')">Edit</button></td></tr>
+              <tr><td>💬</td><td>Translation</td><td class="text-mono">$2.00</td><td>9</td><td><span class="status status-success">ACTIVE</span></td><td><button class="btn btn-outline btn-xs" onclick="toast('Edit coming soon','info')">Edit</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================== MODALS ============================== -->
+<div class="modal-overlay" id="order-modal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="om-title">Order Service</div><button class="modal-close" onclick="closeModal('order-modal')">✕</button></div>
+    <div id="om-desc" style="font-size:13px;color:var(--muted);margin-bottom:22px"></div>
+    <div class="form-group"><label class="form-label">Platform / Details</label><input class="form-input" type="text" placeholder="e.g. Instagram, YouTube URL..." id="om-details"></div>
+    <div class="form-group"><label class="form-label">Quantity / Word Count</label><input class="form-input" type="number" placeholder="e.g. 100" id="om-qty" min="1" oninput="calcOrderTotal()"></div>
+    <div style="background:var(--faint);border-radius:11px;padding:16px;margin-bottom:22px;border:1px solid var(--border2)">
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:8px"><span>Unit Price</span><span id="om-unit-price" class="text-blue">$0.50</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:17px;font-weight:700;color:#fff"><span>Total</span><span id="om-total" class="text-green">$0.00</span></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal('order-modal')">Cancel</button>
+      <button class="btn btn-primary" style="flex:2" onclick="placeOrder()">Place Order →</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="balance-modal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Adjust Balance</div><button class="modal-close" onclick="closeModal('balance-modal')">✕</button></div>
+    <div class="form-group"><label class="form-label">Username</label><input class="form-input" type="text" id="bal-user" readonly></div>
+    <div class="form-group"><label class="form-label">Amount (negative to deduct)</label><input class="form-input" type="number" placeholder="e.g. 50 or -20" id="bal-amount"></div>
+    <div class="form-group"><label class="form-label">Reason</label><input class="form-input" type="text" placeholder="e.g. Manual deposit, bonus..." id="bal-reason"></div>
+    <button class="btn btn-primary btn-full" onclick="applyBalance()">Apply Adjustment</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="service-modal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add New Service</div><button class="modal-close" onclick="closeModal('service-modal')">✕</button></div>
+    <div class="form-group"><label class="form-label">Service Name</label><input class="form-input" type="text" placeholder="e.g. YouTube Comments" id="ns-name"></div>
+    <div class="form-group"><label class="form-label">Icon (emoji)</label><input class="form-input" type="text" placeholder="e.g. 💬" id="ns-icon"></div>
+    <div class="form-group"><label class="form-label">Base Price ($)</label><input class="form-input" type="number" placeholder="e.g. 1.50" id="ns-price" step="0.01"></div>
+    <div class="form-group"><label class="form-label">Description</label><input class="form-input" type="text" placeholder="Brief description..." id="ns-desc"></div>
+    <button class="btn btn-primary btn-full" onclick="addService()">Add Service</button>
+  </div>
+</div>
+
+<script>
+let state={currentUser:null,isAdmin:false,balance:0,earnings:0,referrals:0,orders:[],transactions:[],totalDeposited:0,totalWithdrawn:0,currentOrderService:null,currentOrderPrice:0};
+
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0)}
+function openAuth(tab){showPage('auth');switchTab(tab)}
+function switchTab(tab){document.getElementById('form-login').style.display=tab==='login'?'block':'none';document.getElementById('form-register').style.display=tab==='register'?'block':'none';document.getElementById('tab-login').classList.toggle('active',tab==='login');document.getElementById('tab-register').classList.toggle('active',tab==='register')}
+
+function doLogin(){const u=document.getElementById('li-user').value.trim();const p=document.getElementById('li-pass').value.trim();if(!u||!p){toast('Please enter credentials','error');return}if(u==='admin'&&p==='admin123'){doAdminLogin();return}state.currentUser=u;state.isAdmin=false;state.balance=124.50;state.earnings=18.00;state.referrals=3;state.totalDeposited=200;updateDashboardUI();showPage('dashboard');showDashTab('home',document.getElementById('si-home'));toast('Welcome back, '+u+'! 👋','success')}
+function doAdminLogin(){state.currentUser='admin';state.isAdmin=true;showPage('admin-panel');showAdminTab('overview',document.getElementById('asi-overview'));toast('Welcome, Admin! 🔐','success')}
+function doRegister(){const name=document.getElementById('reg-name').value.trim();const user=document.getElementById('reg-user').value.trim();const email=document.getElementById('reg-email').value.trim();const pass=document.getElementById('reg-pass').value;if(!name||!user||!email||!pass){toast('Please fill all required fields','error');return}if(pass.length<6){toast('Password must be at least 6 characters','error');return}const ref=document.getElementById('reg-ref').value.trim();state.currentUser=user;state.isAdmin=false;state.balance=ref?1:0;state.earnings=0;state.referrals=0;state.totalDeposited=0;updateDashboardUI();showPage('dashboard');showDashTab('home',document.getElementById('si-home'));if(ref)toast('Registered! +$1.00 welcome bonus 🎉','success');else toast('Account created! Welcome to ASG Robot 🎉','success')}
+function logout(){state={currentUser:null,isAdmin:false,balance:0,earnings:0,referrals:0,orders:[],transactions:[],totalDeposited:0,totalWithdrawn:0};showPage('landing');toast('Logged out','info')}
+
+function showDashTab(tab,clickedEl){['home','services','orders','wallet','affiliate','profile'].forEach(t=>{const el=document.getElementById('dt-'+t);if(el)el.style.display=t===tab?'block':'none'});document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));document.querySelectorAll('#dashboard .nav-link').forEach(i=>i.classList.remove('active'));if(clickedEl)clickedEl.classList.add('active');const siEl=document.getElementById('si-'+tab);if(siEl)siEl.classList.add('active');updateDashboardUI();if(tab==='profile')prefillProfile()}
+
+function updateDashboardUI(){if(!state.currentUser)return;const u=state.currentUser;document.getElementById('d-welcome').textContent='Welcome back, '+u+'! 👋';document.getElementById('d-avatar').textContent=u[0].toUpperCase();document.getElementById('d-balance-nav').textContent='$'+state.balance.toFixed(2);document.getElementById('sb-balance').textContent='$'+state.balance.toFixed(2);document.getElementById('sb-earn').textContent='+$'+state.earnings.toFixed(2)+' earnings';document.getElementById('sc-balance').textContent='$'+state.balance.toFixed(2);document.getElementById('sc-earn').textContent='$'+state.earnings.toFixed(2);document.getElementById('sc-orders').textContent=state.orders.length;document.getElementById('sc-refs').textContent=state.referrals;document.getElementById('orders-count-badge').textContent=state.orders.length+' total';document.getElementById('w-balance').textContent='$'+state.balance.toFixed(2);document.getElementById('w-deposits').textContent='$'+state.totalDeposited.toFixed(2);document.getElementById('w-withdrawn').textContent='$'+state.totalWithdrawn.toFixed(2);document.getElementById('aff-total').textContent=state.referrals;document.getElementById('aff-earned').textContent='$'+(state.referrals*1).toFixed(2);document.getElementById('aff-month').textContent=state.referrals;document.getElementById('aff-pending').textContent='$'+(state.referrals*0.5).toFixed(2);document.getElementById('ref-code-display').textContent=u;renderOrdersTable();renderTxnHistory()}
+
+function renderOrdersTable(){const tb=document.getElementById('orders-tbody');const htb=document.querySelector('#home-orders-table tbody');if(state.orders.length===0){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px">No orders yet</td></tr>';htb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:28px">No orders yet. <a href="#" onclick="showDashTab(\'services\',document.getElementById(\'si-services\'));return false" style="color:var(--blue)">Browse services →</a></td></tr>';return}let html='',hhtml='';state.orders.forEach((o,i)=>{const sc=o.status==='Completed'?'status-success':o.status==='Processing'?'status-active':'status-pending';html+=`<tr><td>#${1000+i+1}</td><td>${o.service}</td><td>${o.details}</td><td class="text-green">$${o.amount}</td><td><span class="status ${sc}">${o.status.toUpperCase()}</span></td><td>${o.date}</td></tr>`;if(i<3)hhtml+=`<tr><td>#${1000+i+1}</td><td>${o.service}</td><td class="text-green">$${o.amount}</td><td><span class="status ${sc}">${o.status.toUpperCase()}</span></td><td>${o.date}</td></tr>`});tb.innerHTML=html;htb.innerHTML=hhtml}
+
+function renderTxnHistory(){const tb=document.getElementById('txn-history');if(state.transactions.length===0){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:28px">No transactions yet</td></tr>';return}let html='';state.transactions.forEach(t=>{const cls=t.type==='Deposit'?'text-green':'text-red';const sc=t.status==='Completed'?'status-success':'status-pending';html+=`<tr><td><strong style="color:var(--text)">${t.type}</strong></td><td>${t.method}</td><td class="${cls}">${t.type==='Deposit'?'+':'-'}$${t.amount}</td><td><span class="status ${sc}">${t.status.toUpperCase()}</span></td><td>${t.date}</td></tr>`});tb.innerHTML=html}
+
+function openOrderModal(name,price,icon,desc){if(!state.currentUser){openAuth('login');return}state.currentOrderService=name;state.currentOrderPrice=parseFloat(price);document.getElementById('om-title').textContent=icon+' '+name;document.getElementById('om-desc').textContent=desc;document.getElementById('om-unit-price').textContent='$'+price;document.getElementById('om-qty').value='';document.getElementById('om-details').value='';document.getElementById('om-total').textContent='$0.00';openModal('order-modal')}
+function calcOrderTotal(){const qty=parseInt(document.getElementById('om-qty').value)||0;document.getElementById('om-total').textContent='$'+(qty*state.currentOrderPrice).toFixed(2)}
+function placeOrder(){const details=document.getElementById('om-details').value.trim();const qty=parseInt(document.getElementById('om-qty').value)||0;if(!details){toast('Please enter platform/details','error');return}if(qty<1){toast('Please enter a valid quantity','error');return}const total=parseFloat((qty*state.currentOrderPrice).toFixed(2));if(total>state.balance){toast('Insufficient balance! Please deposit funds.','error');return}state.balance-=total;const now=new Date();state.orders.unshift({service:state.currentOrderService,details:details+' ('+qty+')',amount:total.toFixed(2),status:'Processing',date:now.toLocaleDateString()});state.transactions.unshift({type:'Order',method:'Wallet',amount:total.toFixed(2),status:'Completed',date:now.toLocaleDateString()});updateDashboardUI();closeModal('order-modal');toast('Order placed! We\'ll start working on it now 🚀','success')}
+
+function submitDeposit(){const amount=parseFloat(document.getElementById('dep-amount').value);const method=document.getElementById('dep-method').value;const txn=document.getElementById('dep-txn').value.trim();if(!amount||amount<1){toast('Enter a valid amount (min $1)','error');return}if(!txn){toast('Please enter your Transaction ID','error');return}const now=new Date();state.transactions.unshift({type:'Deposit',method,amount:amount.toFixed(2),status:'Pending',date:now.toLocaleDateString()});toast('Deposit submitted! Admin will approve within 24 hours 📥','success');document.getElementById('dep-amount').value='';document.getElementById('dep-txn').value='';updateDashboardUI()}
+function submitWithdraw(){const amount=parseFloat(document.getElementById('wd-amount').value);const method=document.getElementById('wd-method').value;const account=document.getElementById('wd-account').value.trim();if(!amount||amount<5){toast('Minimum withdrawal is $5.00','error');return}if(amount>state.balance){toast('Insufficient balance','error');return}if(!account){toast('Please enter your account number','error');return}state.balance-=amount;state.totalWithdrawn+=amount;const now=new Date();state.transactions.unshift({type:'Withdraw',method,amount:amount.toFixed(2),status:'Pending',date:now.toLocaleDateString()});toast('Withdrawal request submitted! Processing within 24 hrs 📤','success');document.getElementById('wd-amount').value='';document.getElementById('wd-account').value='';updateDashboardUI()}
+
+function copyRef(){const link='asg-robot.com/ref?code='+(state.currentUser||'user');navigator.clipboard.writeText(link).catch(()=>{});toast('Referral link copied! 🔗','success')}
+function prefillProfile(){document.getElementById('prof-name').value=state.currentUser||'';document.getElementById('prof-email').value=(state.currentUser||'')+'@example.com';document.getElementById('prof-uni').value='University of Dhaka'}
+function saveProfile(){toast('Profile updated successfully ✓','success')}
+
+function showAdminTab(tab,clickedEl){['overview','users','aorders','deposits','withdrawals','aservices'].forEach(t=>{const el=document.getElementById('at-'+t);if(el)el.style.display=t===tab?'block':'none'});document.querySelectorAll('.admin-sidebar .sidebar-item').forEach(i=>i.classList.remove('active'));document.querySelectorAll('#admin-panel .nav-link').forEach(i=>i.classList.remove('active'));if(clickedEl)clickedEl.classList.add('active');const siEl=document.getElementById('asi-'+tab);if(siEl)siEl.classList.add('active')}
+function adminAdjustBalance(username){document.getElementById('bal-user').value=username;document.getElementById('bal-amount').value='';document.getElementById('bal-reason').value='';openModal('balance-modal')}
+function applyBalance(){const amount=parseFloat(document.getElementById('bal-amount').value);const reason=document.getElementById('bal-reason').value.trim();if(!amount){toast('Enter a valid amount','error');return}if(!reason){toast('Please enter a reason','error');return}closeModal('balance-modal');toast('Balance adjusted by $'+amount.toFixed(2),'success')}
+function approveDeposit(btn,user,amount){const row=btn.closest('tr');row.querySelector('.status').textContent='APPROVED';row.querySelector('.status').className='status status-success';btn.parentElement.innerHTML='—';toast('Deposit of $'+amount+' approved for '+user,'success')}
+function addService(){const name=document.getElementById('ns-name').value.trim();const icon=document.getElementById('ns-icon').value.trim();const price=document.getElementById('ns-price').value;if(!name||!icon||!price){toast('Please fill all fields','error');return}const tbody=document.querySelector('#admin-services-table tbody');tbody.innerHTML+=`<tr><td>${icon}</td><td>${name}</td><td>$${parseFloat(price).toFixed(2)}</td><td>0</td><td><span class="status status-success">ACTIVE</span></td><td><button class="btn btn-outline btn-xs" onclick="toast('Edit coming soon','info')">Edit</button></td></tr>`;closeModal('service-modal');toast('Service "'+name+'" added!','success')}
+function openAddServiceModal(){openModal('service-modal')}
+function filterUsers(val){const rows=document.querySelectorAll('#users-tbody tr');rows.forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(val.toLowerCase())?'':'none'})}
+
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')})});
+
+let toastTimer;
+function toast(msg,type='success'){const t=document.getElementById('toast');t.textContent=(type==='success'?'✓ ':type==='error'?'✕ ':'ℹ ')+msg;t.className='show '+type;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3200)}
+
+function updateClock(){const now=new Date();const el=document.getElementById('admin-clock-display');if(el)el.textContent='Today: '+now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+' — '+now.toLocaleTimeString()}
+setInterval(updateClock,1000);updateClock();
+</script>
+</body>
+</html>
